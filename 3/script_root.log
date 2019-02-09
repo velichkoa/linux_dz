@@ -1,0 +1,445 @@
+[root@lvm vagrant]# script
+Script started, file is typescript
+[root@lvm vagrant]# lsblk
+NAME                    MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
+sda                       8:0    0   40G  0 disk
++-sda1                    8:1    0    1M  0 part
++-sda2                    8:2    0    1G  0 part /boot
+L-sda3                    8:3    0   39G  0 part
+  +-VolGroup00-LogVol00 253:0    0 37.5G  0 lvm  /
+  L-VolGroup00-LogVol01 253:1    0  1.5G  0 lvm  [SWAP]
+sdb                       8:16   0   10G  0 disk
++-vg1-tst               253:2    0   10G  0 lvm
+L-vg1-smalltst          253:3    0  124M  0 lvm
+sdc                       8:32   0    2G  0 disk
+L-vg1-tst               253:2    0   10G  0 lvm
+sdd                       8:48   0    1G  0 disk
++-vg0-mirror_rmeta_0    253:4    0    4M  0 lvm
+¦ L-vg0-mirror          253:8    0  816M  0 lvm
+L-vg0-mirror_rimage_0   253:5    0  816M  0 lvm
+  L-vg0-mirror          253:8    0  816M  0 lvm
+sde                       8:64   0    1G  0 disk
++-vg0-mirror_rmeta_1    253:6    0    4M  0 lvm
+¦ L-vg0-mirror          253:8    0  816M  0 lvm
+L-vg0-mirror_rimage_1   253:7    0  816M  0 lvm
+  L-vg0-mirror          253:8    0  816M  0 lvm
+[root@lvm vagrant]# cd /data
+[root@lvm data]# ll
+total 0
+[root@lvm data]# cd /
+[root@lvm /]# ll
+total 20
+lrwxrwxrwx.   1 root    root       7 May 12  2018 bin -> usr/bin
+dr-xr-xr-x.   5 root    root    4096 Feb  9 11:56 boot
+drwxr-xr-x.   2 root    root       6 Feb  9 12:32 data
+drwxr-xr-x.   2 root    root       6 Feb  9 13:24 data-snap
+drwxr-xr-x.  21 root    root    3380 Feb  9 13:44 dev
+drwxr-xr-x.  80 root    root    8192 Feb  9 13:44 etc
+drwxr-xr-x.   3 root    root      21 May 12  2018 home
+lrwxrwxrwx.   1 root    root       7 May 12  2018 lib -> usr/lib
+lrwxrwxrwx.   1 root    root       9 May 12  2018 lib64 -> usr/lib64
+drwxr-xr-x.   2 root    root       6 Apr 11  2018 media
+drwxr-xr-x.   2 root    root       6 Apr 11  2018 mnt
+drwxr-xr-x.   3 root    root      38 Feb  9 11:55 opt
+dr-xr-xr-x. 187 root    root       0 Feb  9 13:44 proc
+dr-xr-x---.   3 root    root     188 Feb  9 13:34 root
+drwxr-xr-x.  26 root    root     880 Feb  9 13:44 run
+lrwxrwxrwx.   1 root    root       8 May 12  2018 sbin -> usr/sbin
+drwxr-xr-x.   2 root    root       6 Apr 11  2018 srv
+dr-xr-xr-x.  13 root    root       0 Feb  9 13:44 sys
+drwxrwxrwt.   8 root    root     225 Feb  9 13:45 tmp
+drwxr-xr-x.  13 root    root     155 May 12  2018 usr
+drwxrwxrwx.   1 vagrant vagrant 4096 Feb  9 13:49 vagrant
+drwxr-xr-x.  18 root    root     254 Feb  9 11:51 var
+[root@lvm /]# df
+Filesystem                      1K-blocks      Used Available Use% Mounted on
+/dev/mapper/VolGroup00-LogVol00  39269648   1561564  37708084   4% /
+devtmpfs                           111840         0    111840   0% /dev
+tmpfs                              120692         0    120692   0% /dev/shm
+tmpfs                              120692      4652    116040   4% /run
+tmpfs                              120692         0    120692   0% /sys/fs/cgroup
+/dev/sda2                         1038336     62288    976048   6% /boot
+vagrant                         976760828 955641344  21119484  98% /vagrant
+tmpfs                               24140         0     24140   0% /run/user/1000
+[root@lvm /]# df
+Filesystem                      1K-blocks      Used Available Use% Mounted on
+/dev/mapper/VolGroup00-LogVol00  39269648   1561564  37708084   4% /
+devtmpfs                           111840         0    111840   0% /dev
+tmpfs                              120692         0    120692   0% /dev/shm
+tmpfs                              120692      4652    116040   4% /run
+tmpfs                              120692         0    120692   0% /sys/fs/cgroup
+/dev/sda2                         1038336     62288    976048   6% /boot
+vagrant                         976760828 955641344  21119484  98% /vagrant
+tmpfs                               24140         0     24140   0% /run/user/1000
+[root@lvm /]# lvremove /dev/vg1/tst
+Do you really want to remove active logical volume vg1/tst? [y/n]: y
+  Logical volume "tst" successfully removed
+[root@lvm /]# lsblk
+NAME                    MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
+sda                       8:0    0   40G  0 disk
++-sda1                    8:1    0    1M  0 part
++-sda2                    8:2    0    1G  0 part /boot
+L-sda3                    8:3    0   39G  0 part
+  +-VolGroup00-LogVol00 253:0    0 37.5G  0 lvm  /
+  L-VolGroup00-LogVol01 253:1    0  1.5G  0 lvm  [SWAP]
+sdb                       8:16   0   10G  0 disk
+L-vg1-smalltst          253:3    0  124M  0 lvm
+sdc                       8:32   0    2G  0 disk
+sdd                       8:48   0    1G  0 disk
++-vg0-mirror_rmeta_0    253:4    0    4M  0 lvm
+¦ L-vg0-mirror          253:8    0  816M  0 lvm
+L-vg0-mirror_rimage_0   253:5    0  816M  0 lvm
+  L-vg0-mirror          253:8    0  816M  0 lvm
+sde                       8:64   0    1G  0 disk
++-vg0-mirror_rmeta_1    253:6    0    4M  0 lvm
+¦ L-vg0-mirror          253:8    0  816M  0 lvm
+L-vg0-mirror_rimage_1   253:7    0  816M  0 lvm
+  L-vg0-mirror          253:8    0  816M  0 lvm
+[root@lvm /]# vgremove /dev/vg1
+Do you really want to remove volume group "vg1" containing 1 logical volumes? [y/n]: y
+Do you really want to remove active logical volume vg1/smalltst? [y/n]: y
+  Logical volume "smalltst" successfully removed
+  Volume group "vg1" successfully removed
+[root@lvm /]# lsblk
+NAME                    MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
+sda                       8:0    0   40G  0 disk
++-sda1                    8:1    0    1M  0 part
++-sda2                    8:2    0    1G  0 part /boot
+L-sda3                    8:3    0   39G  0 part
+  +-VolGroup00-LogVol00 253:0    0 37.5G  0 lvm  /
+  L-VolGroup00-LogVol01 253:1    0  1.5G  0 lvm  [SWAP]
+sdb                       8:16   0   10G  0 disk
+sdc                       8:32   0    2G  0 disk
+sdd                       8:48   0    1G  0 disk
++-vg0-mirror_rmeta_0    253:4    0    4M  0 lvm
+¦ L-vg0-mirror          253:8    0  816M  0 lvm
+L-vg0-mirror_rimage_0   253:5    0  816M  0 lvm
+  L-vg0-mirror          253:8    0  816M  0 lvm
+sde                       8:64   0    1G  0 disk
++-vg0-mirror_rmeta_1    253:6    0    4M  0 lvm
+¦ L-vg0-mirror          253:8    0  816M  0 lvm
+L-vg0-mirror_rimage_1   253:7    0  816M  0 lvm
+  L-vg0-mirror          253:8    0  816M  0 lvm
+[root@lvm /]# vgremove /dev/vg0
+Do you really want to remove volume group "vg0" containing 1 logical volumes? [y/n]: y
+Do you really want to remove active logical volume vg0/mirror? [y/n]: y
+  Logical volume "mirror" successfully removed
+  Volume group "vg0" successfully removed
+[root@lvm /]# lsblk
+NAME                    MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
+sda                       8:0    0   40G  0 disk
++-sda1                    8:1    0    1M  0 part
++-sda2                    8:2    0    1G  0 part /boot
+L-sda3                    8:3    0   39G  0 part
+  +-VolGroup00-LogVol00 253:0    0 37.5G  0 lvm  /
+  L-VolGroup00-LogVol01 253:1    0  1.5G  0 lvm  [SWAP]
+sdb                       8:16   0   10G  0 disk
+sdc                       8:32   0    2G  0 disk
+sdd                       8:48   0    1G  0 disk
+sde                       8:64   0    1G  0 disk
+[root@lvm /]# pvdisplay
+  --- Physical volume ---
+  PV Name               /dev/sda3
+  VG Name               VolGroup00
+  PV Size               <39.00 GiB / not usable 30.00 MiB
+  Allocatable           yes (but full)
+  PE Size               32.00 MiB
+  Total PE              1247
+  Free PE               0
+  Allocated PE          1247
+  PV UUID               vrrtbx-g480-HcJI-5wLn-4aOf-Olld-rC03AY
+
+  "/dev/sdb" is a new physical volume of "10.00 GiB"
+  --- NEW Physical volume ---
+  PV Name               /dev/sdb
+  VG Name
+  PV Size               10.00 GiB
+  Allocatable           NO
+  PE Size               0
+  Total PE              0
+  Free PE               0
+  Allocated PE          0
+  PV UUID               TTMpQ3-ts0q-2QbE-WY6z-5Mef-ihUd-9cX01o
+
+  "/dev/sdc" is a new physical volume of "2.00 GiB"
+  --- NEW Physical volume ---
+  PV Name               /dev/sdc
+  VG Name
+  PV Size               2.00 GiB
+  Allocatable           NO
+  PE Size               0
+  Total PE              0
+  Free PE               0
+  Allocated PE          0
+  PV UUID               Imcoxw-uHhc-8Emj-LnzR-yt37-dRBN-Ue1u0H
+
+  "/dev/sdd" is a new physical volume of "1.00 GiB"
+  --- NEW Physical volume ---
+  PV Name               /dev/sdd
+  VG Name
+  PV Size               1.00 GiB
+  Allocatable           NO
+  PE Size               0
+  Total PE              0
+  Free PE               0
+  Allocated PE          0
+  PV UUID               kyXaag-vcXI-XZjz-61d2-nBEn-SHLd-coq3Ri
+
+  "/dev/sde" is a new physical volume of "1.00 GiB"
+  --- NEW Physical volume ---
+  PV Name               /dev/sde
+  VG Name
+  PV Size               1.00 GiB
+  Allocatable           NO
+  PE Size               0
+  Total PE              0
+  Free PE               0
+  Allocated PE          0
+  PV UUID               DnrQK3-wqcY-63El-Ks70-2V0J-S9Ef-9zMiXg
+
+[root@lvm /]# vgcreate vg_root /dev/sdb
+  Volume group "vg_root" successfully created
+[root@lvm /]# lvcreate -n lv_root -l +100%free /dev/vg_root
+WARNING: ext4 signature detected on /dev/vg_root/lv_root at offset 1080. Wipe it? [y/n]: y
+  Wiping ext4 signature on /dev/vg_root/lv_root.
+  Logical volume "lv_root" created.
+[root@lvm /]# mkfs.xfs /dev/vg_root/lv_root
+meta-data=/dev/vg_root/lv_root   isize=512    agcount=4, agsize=655104 blks
+         =                       sectsz=512   attr=2, projid32bit=1
+         =                       crc=1        finobt=0, sparse=0
+data     =                       bsize=4096   blocks=2620416, imaxpct=25
+         =                       sunit=0      swidth=0 blks
+naming   =version 2              bsize=4096   ascii-ci=0 ftype=1
+log      =internal log           bsize=4096   blocks=2560, version=2
+         =                       sectsz=512   sunit=0 blks, lazy-count=1
+realtime =none                   extsz=4096   blocks=0, rtextents=0
+[root@lvm /]# mount /dev/vg_root/lv_root /mnt
+[root@lvm /]# df
+Filesystem                      1K-blocks      Used Available Use% Mounted on
+/dev/mapper/VolGroup00-LogVol00  39269648   1561584  37708064   4% /
+devtmpfs                           111840         0    111840   0% /dev
+tmpfs                              120692         0    120692   0% /dev/shm
+tmpfs                              120692      4628    116064   4% /run
+tmpfs                              120692         0    120692   0% /sys/fs/cgroup
+/dev/sda2                         1038336     62288    976048   6% /boot
+vagrant                         976760828 955641360  21119468  98% /vagrant
+tmpfs                               24140         0     24140   0% /run/user/1000
+/dev/mapper/vg_root-lv_root      10471424     32944  10438480   1% /mnt
+[root@lvm /]# yum install xfsdump
+Loaded plugins: fastestmirror
+Loading mirror speeds from cached hostfile
+ * base: mirror.reconn.ru
+ * extras: mirror.sale-dedic.com
+ * updates: mirror.awanti.com
+Resolving Dependencies
+--> Running transaction check
+---> Package xfsdump.x86_64 0:3.1.7-1.el7 will be installed
+--> Processing Dependency: attr >= 2.0.0 for package: xfsdump-3.1.7-1.el7.x86_64
+--> Running transaction check
+---> Package attr.x86_64 0:2.4.46-13.el7 will be installed
+--> Finished Dependency Resolution
+
+Dependencies Resolved
+
+======================================================================================================================================
+ Package                        Arch                          Version                               Repository                   Size
+======================================================================================================================================
+Installing:
+ xfsdump                        x86_64                        3.1.7-1.el7                           base                        308 k
+Installing for dependencies:
+ attr                           x86_64                        2.4.46-13.el7                         base                         66 k
+
+Transaction Summary
+======================================================================================================================================
+Install  1 Package (+1 Dependent package)
+
+Total download size: 374 k
+Installed size: 1.1 M
+Is this ok [y/d/N]: y
+Downloading packages:
+(1/2): attr-2.4.46-13.el7.x86_64.rpm                                                                           |  66 kB  00:00:00
+(2/2): xfsdump-3.1.7-1.el7.x86_64.rpm                                                                          | 308 kB  00:00:00
+--------------------------------------------------------------------------------------------------------------------------------------
+Total                                                                                                 817 kB/s | 374 kB  00:00:00
+Running transaction check
+Running transaction test
+Transaction test succeeded
+Running transaction
+  Installing : attr-2.4.46-13.el7.x86_64                                                                                          1/2
+  Installing : xfsdump-3.1.7-1.el7.x86_64                                                                                         2/2
+  Verifying  : attr-2.4.46-13.el7.x86_64                                                                                          1/2
+  Verifying  : xfsdump-3.1.7-1.el7.x86_64                                                                                         2/2
+
+Installed:
+  xfsdump.x86_64 0:3.1.7-1.el7
+
+Dependency Installed:
+  attr.x86_64 0:2.4.46-13.el7
+
+Complete!
+[root@lvm /]# xfsdump -J - /dev/VolGroup00/LogVol00 | xfsrestore -J - /mnt
+xfsrestore: using file dump (drive_simple) strategy
+xfsrestore: version 3.1.7 (dump format 3.0)
+xfsdump: using file dump (drive_simple) strategy
+xfsdump: version 3.1.7 (dump format 3.0)
+xfsdump: level 0 dump of lvm:/
+xfsdump: dump date: Sat Feb  9 14:03:43 2019
+xfsdump: session id: 5e011d78-4333-4d3c-b95f-4d411794bb5c
+xfsdump: session label: ""
+xfsrestore: searching media for dump
+xfsdump: ino map phase 1: constructing initial dump list
+xfsdump: ino map phase 2: skipping (no pruning necessary)
+xfsdump: ino map phase 3: skipping (only one dump stream)
+xfsdump: ino map construction complete
+xfsdump: estimated dump size: 1558061888 bytes
+xfsdump: creating dump session media file 0 (media 0, file 0)
+xfsdump: dumping ino map
+xfsdump: dumping directories
+xfsrestore: examining media file 0
+xfsrestore: dump description:
+xfsrestore: hostname: lvm
+xfsrestore: mount point: /
+xfsrestore: volume: /dev/mapper/VolGroup00-LogVol00
+xfsrestore: session time: Sat Feb  9 14:03:43 2019
+xfsrestore: level: 0
+xfsrestore: session label: ""
+xfsrestore: media label: ""
+xfsrestore: file system id: b60e9498-0baa-4d9f-90aa-069048217fee
+xfsrestore: session id: 5e011d78-4333-4d3c-b95f-4d411794bb5c
+xfsrestore: media id: 446e1eb8-6d5a-4cb5-bac0-af72dddb9b2e
+xfsrestore: searching media for directory dump
+xfsrestore: reading directories
+xfsdump: dumping non-directory files
+xfsrestore: 7146 directories and 44475 entries processed
+xfsrestore: directory post-processing
+xfsrestore: restoring non-directory files
+xfsdump: ending media file
+xfsdump: media file size 1514352008 bytes
+xfsdump: dump size (non-dir files) : 1487848616 bytes
+xfsdump: dump complete: 100 seconds elapsed
+xfsdump: Dump Status: SUCCESS
+xfsrestore: restore complete: 103 seconds elapsed
+xfsrestore: Restore Status: SUCCESS
+[root@lvm /]# ls /mnt
+bin  boot  data  data-snap  dev  etc  home  lib  lib64  media  mnt  opt  proc  root  run  sbin  srv  sys  tmp  usr  vagrant  var
+[root@lvm /]# for i in /proc/ /sys/ /dev/ /run/ /boot/; do mount --bind $i /mnt/$i; done
+[root@lvm /]# chroot /mnt/
+[root@lvm /]# grub2-mkconfig -o /boot/grub2/grub.cfg
+Generating grub configuration file ...
+Found linux image: /boot/vmlinuz-3.10.0-862.2.3.el7.x86_64
+Found initrd image: /boot/initramfs-3.10.0-862.2.3.el7.x86_64.img
+done
+[root@lvm /]# cd /boot ; for i in 'ls initramfs-*img'; do dracut -v $i 'echo $i|sed "s/initramfs-//g; s/.img//g"' --force; done
+
+Unknown arguments: echo $i|sed "s/initramfs-//g; s/.img//g"
+
+Usage: /sbin/dracut [OPTION]... [<initramfs> [<kernel-version>]]
+
+Version: 033-535.el7
+
+Creates initial ramdisk images for preloading modules
+
+  -h, --help  Display all options
+
+If a [LIST] has multiple arguments, then you have to put these in quotes.
+
+For example:
+
+    # dracut --add-drivers "module1 module2"  ...
+
+[root@lvm boot]# cd /boot ; for i in `ls initramfs-*img`; do dracut -v $i `echo $i|sed "s/initramfs-//g;
+> s/.img//g"` --force; done
+Executing: /sbin/dracut -v initramfs-3.10.0-862.2.3.el7.x86_64.img 3.10.0-862.2.3.el7.x86_64 --force
+dracut module 'busybox' will not be installed, because command 'busybox' could not be found!
+dracut module 'crypt' will not be installed, because command 'cryptsetup' could not be found!
+dracut module 'dmraid' will not be installed, because command 'dmraid' could not be found!
+dracut module 'dmsquash-live-ntfs' will not be installed, because command 'ntfs-3g' could not be found!
+dracut module 'multipath' will not be installed, because command 'multipath' could not be found!
+dracut module 'busybox' will not be installed, because command 'busybox' could not be found!
+dracut module 'crypt' will not be installed, because command 'cryptsetup' could not be found!
+dracut module 'dmraid' will not be installed, because command 'dmraid' could not be found!
+dracut module 'dmsquash-live-ntfs' will not be installed, because command 'ntfs-3g' could not be found!
+dracut module 'multipath' will not be installed, because command 'multipath' could not be found!
+*** Including module: bash ***
+*** Including module: nss-softokn ***
+*** Including module: i18n ***
+*** Including module: drm ***
+*** Including module: plymouth ***
+*** Including module: dm ***
+Skipping udev rule: 64-device-mapper.rules
+Skipping udev rule: 60-persistent-storage-dm.rules
+Skipping udev rule: 55-dm.rules
+*** Including module: kernel-modules ***
+Omitting driver floppy
+*** Including module: lvm ***
+Skipping udev rule: 64-device-mapper.rules
+Skipping udev rule: 56-lvm.rules
+Skipping udev rule: 60-persistent-storage-lvm.rules
+*** Including module: qemu ***
+*** Including module: resume ***
+*** Including module: rootfs-block ***
+*** Including module: terminfo ***
+*** Including module: udev-rules ***
+Skipping udev rule: 40-redhat-cpu-hotplug.rules
+Skipping udev rule: 91-permissions.rules
+*** Including module: biosdevname ***
+*** Including module: systemd ***
+*** Including module: usrmount ***
+*** Including module: base ***
+*** Including module: fs-lib ***
+*** Including module: shutdown ***
+*** Including modules done ***
+*** Installing kernel module dependencies and firmware ***
+*** Installing kernel module dependencies and firmware done ***
+*** Resolving executable dependencies ***
+*** Resolving executable dependencies done***
+*** Hardlinking files ***
+*** Hardlinking files done ***
+*** Stripping files ***
+*** Stripping files done ***
+*** Generating early-microcode cpio image contents ***
+*** No early-microcode cpio image needed ***
+*** Store current command line parameters ***
+*** Creating image file ***
+*** Creating image file done ***
+*** Creating initramfs image file '/boot/initramfs-3.10.0-862.2.3.el7.x86_64.img' done ***
+[root@lvm boot]# reboot
+Running in chroot, ignoring request.
+[root@lvm boot]# lsblk
+NAME                    MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
+sda                       8:0    0   40G  0 disk
++-sda1                    8:1    0    1M  0 part
++-sda2                    8:2    0    1G  0 part /boot
+L-sda3                    8:3    0   39G  0 part
+  +-VolGroup00-LogVol00 253:0    0 37.5G  0 lvm
+  L-VolGroup00-LogVol01 253:1    0  1.5G  0 lvm  [SWAP]
+sdb                       8:16   0   10G  0 disk
+L-vg_root-lv_root       253:2    0   10G  0 lvm  /
+sdc                       8:32   0    2G  0 disk
+sdd                       8:48   0    1G  0 disk
+sde                       8:64   0    1G  0 disk
+[root@lvm boot]# exit
+exit
+[root@lvm /]# exit
+exit
+Script done, file is typescript
+[root@lvm vagrant]# reboot
+Connection to 127.0.0.1 closed by remote host.
+Connection to 127.0.0.1 closed.
+
+velichko_aa@vaa MINGW64 /d/otus-linux3
+$ vagrant ssh lvm
+Last login: Sat Feb  9 13:45:18 2019 from 10.0.2.2
+[vagrant@lvm ~]$ lsblk
+NAME                    MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
+sda                       8:0    0   40G  0 disk
++-sda1                    8:1    0    1M  0 part
++-sda2                    8:2    0    1G  0 part /boot
+L-sda3                    8:3    0   39G  0 part
+  +-VolGroup00-LogVol00 253:1    0 37.5G  0 lvm
+  L-VolGroup00-LogVol01 253:2    0  1.5G  0 lvm  [SWAP]
+sdb                       8:16   0   10G  0 disk
+L-vg_root-lv_root       253:0    0   10G  0 lvm  /
+sdc                       8:32   0    2G  0 disk
+sdd                       8:48   0    1G  0 disk
+sde                       8:64   0    1G  0 disk
