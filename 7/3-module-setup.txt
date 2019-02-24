@@ -1,0 +1,270 @@
+[root@lvm vagrant]#  cd /usr/lib/dracut/modules.d
+[root@lvm modules.d]# mkdir 01test
+[root@lvm modules.d]# touch module-setup.sh
+[root@lvm modules.d]# vi module-setup.sh
+[root@lvm modules.d]# touch test.sh
+[root@lvm modules.d]# vi test.sh
+[root@lvm modules.d]# dracut -f -v
+Executing: /sbin/dracut -f -v
+dracut module 'busybox' will not be installed, because command 'busybox' could not be found!
+dracut module 'crypt' will not be installed, because command 'cryptsetup' could not be found!
+dracut module 'dmraid' will not be installed, because command 'dmraid' could not be found!
+dracut module 'dmsquash-live-ntfs' will not be installed, because command 'ntfs-3g' could not be found!
+dracut module 'multipath' will not be installed, because command 'multipath' could not be found!
+dracut module 'busybox' will not be installed, because command 'busybox' could not be found!
+dracut module 'crypt' will not be installed, because command 'cryptsetup' could not be found!
+dracut module 'dmraid' will not be installed, because command 'dmraid' could not be found!
+dracut module 'dmsquash-live-ntfs' will not be installed, because command 'ntfs-3g' could not be found!
+dracut module 'multipath' will not be installed, because command 'multipath' could not be found!
+*** Including module: bash ***
+*** Including module: nss-softokn ***
+*** Including module: i18n ***
+*** Including module: drm ***
+*** Including module: plymouth ***
+*** Including module: dm ***
+Skipping udev rule: 64-device-mapper.rules
+Skipping udev rule: 60-persistent-storage-dm.rules
+Skipping udev rule: 55-dm.rules
+*** Including module: kernel-modules ***
+Omitting driver floppy
+*** Including module: lvm ***
+Skipping udev rule: 64-device-mapper.rules
+Skipping udev rule: 56-lvm.rules
+Skipping udev rule: 60-persistent-storage-lvm.rules
+*** Including module: qemu ***
+*** Including module: resume ***
+*** Including module: rootfs-block ***
+*** Including module: terminfo ***
+*** Including module: udev-rules ***
+Skipping udev rule: 40-redhat-cpu-hotplug.rules
+Skipping udev rule: 91-permissions.rules
+*** Including module: biosdevname ***
+*** Including module: systemd ***
+*** Including module: usrmount ***
+*** Including module: base ***
+*** Including module: fs-lib ***
+*** Including module: shutdown ***
+*** Including modules done ***
+*** Installing kernel module dependencies and firmware ***
+*** Installing kernel module dependencies and firmware done ***
+*** Resolving executable dependencies ***
+*** Resolving executable dependencies done***
+*** Hardlinking files ***
+*** Hardlinking files done ***
+*** Stripping files ***
+*** Stripping files done ***
+*** Generating early-microcode cpio image contents ***
+*** No early-microcode cpio image needed ***
+*** Store current command line parameters ***
+*** Creating image file ***
+*** Creating image file done ***
+*** Creating initramfs image file '/boot/initramfs-3.10.0-862.2.3.el7.x86_64.img' done ***
+[root@lvm modules.d]#  lsinitrd -m /boot/initramfs-$(uname -r).img
+Image: /boot/initramfs-3.10.0-862.2.3.el7.x86_64.img: 14M
+========================================================================
+Version: dracut-033-535.el7
+
+dracut modules:
+bash
+nss-softokn
+i18n
+drm
+plymouth
+dm
+kernel-modules
+lvm
+qemu
+resume
+rootfs-block
+terminfo
+udev-rules
+biosdevname
+systemd
+usrmount
+base
+fs-lib
+shutdown
+========================================================================
+[root@lvm modules.d]#  lsinitrd -m /boot/initramfs-$(uname -r).img | grep test
+[root@lvm modules.d]# ls
+00bash               30convertfs  90dmraid              91crypt-gpg     95udev-rules   98usrmount
+00systemd-bootchart  45url-lib    90dmsquash-live       91crypt-loop    95virtfs       99base
+01test               50drm        90dmsquash-live-ntfs  95dasd          95zfcp         99fs-lib
+03modsign            50plymouth   90kernel-modules      95dasd_mod      97biosdevname  99img-lib
+03rescue             80cms        90lvm                 95debug         98ecryptfs     99shutdown
+04watchdog           90bcache     90mdraid              95fstab-sys     98pollcdrom    module-setup.sh
+05busybox            90btrfs      90multipath           95resume        98selinux      test.sh
+05nss-softokn        90crypt      90multipath-hostonly  95rootfs-block  98syslog
+10i18n               90dm         90qemu                95terminfo      98systemd
+[root@lvm modules.d]# less test.sh
+[root@lvm modules.d]# mkinitrd -f -v /boot/initramfs-$(uname -r).img $(uname -r)
+Executing: /sbin/dracut -f -v /boot/initramfs-3.10.0-862.2.3.el7.x86_64.img 3.10.0-862.2.3.el7.x86_64
+dracut module 'busybox' will not be installed, because command 'busybox' could not be found!
+dracut module 'crypt' will not be installed, because command 'cryptsetup' could not be found!
+dracut module 'dmraid' will not be installed, because command 'dmraid' could not be found!
+dracut module 'dmsquash-live-ntfs' will not be installed, because command 'ntfs-3g' could not be found!
+dracut module 'multipath' will not be installed, because command 'multipath' could not be found!
+dracut module 'busybox' will not be installed, because command 'busybox' could not be found!
+dracut module 'crypt' will not be installed, because command 'cryptsetup' could not be found!
+dracut module 'dmraid' will not be installed, because command 'dmraid' could not be found!
+dracut module 'dmsquash-live-ntfs' will not be installed, because command 'ntfs-3g' could not be found!
+dracut module 'multipath' will not be installed, because command 'multipath' could not be found!
+*** Including module: bash ***
+*** Including module: nss-softokn ***
+*** Including module: i18n ***
+*** Including module: drm ***
+*** Including module: plymouth ***
+*** Including module: dm ***
+Skipping udev rule: 64-device-mapper.rules
+Skipping udev rule: 60-persistent-storage-dm.rules
+Skipping udev rule: 55-dm.rules
+*** Including module: kernel-modules ***
+Omitting driver floppy
+*** Including module: lvm ***
+Skipping udev rule: 64-device-mapper.rules
+Skipping udev rule: 56-lvm.rules
+Skipping udev rule: 60-persistent-storage-lvm.rules
+*** Including module: qemu ***
+*** Including module: resume ***
+*** Including module: rootfs-block ***
+*** Including module: terminfo ***
+*** Including module: udev-rules ***
+Skipping udev rule: 40-redhat-cpu-hotplug.rules
+Skipping udev rule: 91-permissions.rules
+*** Including module: biosdevname ***
+*** Including module: systemd ***
+*** Including module: usrmount ***
+*** Including module: base ***
+*** Including module: fs-lib ***
+*** Including module: shutdown ***
+*** Including modules done ***
+*** Installing kernel module dependencies and firmware ***
+*** Installing kernel module dependencies and firmware done ***
+*** Resolving executable dependencies ***
+*** Resolving executable dependencies done***
+*** Hardlinking files ***
+*** Hardlinking files done ***
+*** Stripping files ***
+*** Stripping files done ***
+*** Generating early-microcode cpio image contents ***
+*** No early-microcode cpio image needed ***
+*** Store current command line parameters ***
+*** Creating image file ***
+*** Creating image file done ***
+*** Creating initramfs image file '/boot/initramfs-3.10.0-862.2.3.el7.x86_64.img' done ***
+[root@lvm modules.d]#  lsinitrd -m /boot/initramfs-$(uname -r).img
+Image: /boot/initramfs-3.10.0-862.2.3.el7.x86_64.img: 14M
+========================================================================
+Version: dracut-033-535.el7
+
+dracut modules:
+bash
+nss-softokn
+i18n
+drm
+plymouth
+dm
+kernel-modules
+lvm
+qemu
+resume
+rootfs-block
+terminfo
+udev-rules
+biosdevname
+systemd
+usrmount
+base
+fs-lib
+shutdown
+========================================================================
+[root@lvm modules.d]# move module-setup.sh test.sh 01test
+bash: move: command not found
+[root@lvm modules.d]# mv module-setup.sh test.sh 01test
+[root@lvm modules.d]# ls 01test
+module-setup.sh  test.sh
+[root@lvm modules.d]# dracut -f -v
+Executing: /sbin/dracut -f -v
+dracut module 'busybox' will not be installed, because command 'busybox' could not be found!
+dracut module 'crypt' will not be installed, because command 'cryptsetup' could not be found!
+dracut module 'dmraid' will not be installed, because command 'dmraid' could not be found!
+dracut module 'dmsquash-live-ntfs' will not be installed, because command 'ntfs-3g' could not be found!
+dracut module 'multipath' will not be installed, because command 'multipath' could not be found!
+dracut module 'busybox' will not be installed, because command 'busybox' could not be found!
+dracut module 'crypt' will not be installed, because command 'cryptsetup' could not be found!
+dracut module 'dmraid' will not be installed, because command 'dmraid' could not be found!
+dracut module 'dmsquash-live-ntfs' will not be installed, because command 'ntfs-3g' could not be found!
+dracut module 'multipath' will not be installed, because command 'multipath' could not be found!
+*** Including module: bash ***
+*** Including module: test ***
+*** Including module: nss-softokn ***
+*** Including module: i18n ***
+*** Including module: drm ***
+*** Including module: plymouth ***
+*** Including module: dm ***
+Skipping udev rule: 64-device-mapper.rules
+Skipping udev rule: 60-persistent-storage-dm.rules
+Skipping udev rule: 55-dm.rules
+*** Including module: kernel-modules ***
+Omitting driver floppy
+*** Including module: lvm ***
+Skipping udev rule: 64-device-mapper.rules
+Skipping udev rule: 56-lvm.rules
+Skipping udev rule: 60-persistent-storage-lvm.rules
+*** Including module: qemu ***
+*** Including module: resume ***
+*** Including module: rootfs-block ***
+*** Including module: terminfo ***
+*** Including module: udev-rules ***
+Skipping udev rule: 40-redhat-cpu-hotplug.rules
+Skipping udev rule: 91-permissions.rules
+*** Including module: biosdevname ***
+*** Including module: systemd ***
+*** Including module: usrmount ***
+*** Including module: base ***
+*** Including module: fs-lib ***
+*** Including module: shutdown ***
+*** Including modules done ***
+*** Installing kernel module dependencies and firmware ***
+*** Installing kernel module dependencies and firmware done ***
+*** Resolving executable dependencies ***
+*** Resolving executable dependencies done***
+*** Hardlinking files ***
+*** Hardlinking files done ***
+*** Stripping files ***
+*** Stripping files done ***
+*** Generating early-microcode cpio image contents ***
+*** No early-microcode cpio image needed ***
+*** Store current command line parameters ***
+*** Creating image file ***
+*** Creating image file done ***
+*** Creating initramfs image file '/boot/initramfs-3.10.0-862.2.3.el7.x86_64.img' done ***
+[root@lvm modules.d]#  lsinitrd -m /boot/initramfs-$(uname -r).img
+Image: /boot/initramfs-3.10.0-862.2.3.el7.x86_64.img: 14M
+========================================================================
+Version: dracut-033-535.el7
+
+dracut modules:
+bash
+test
+nss-softokn
+i18n
+drm
+plymouth
+dm
+kernel-modules
+lvm
+qemu
+resume
+rootfs-block
+terminfo
+udev-rules
+biosdevname
+systemd
+usrmount
+base
+fs-lib
+shutdown
+========================================================================
+[root@lvm modules.d]# 
+

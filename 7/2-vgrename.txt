@@ -1,0 +1,98 @@
+[root@lvm vagrant]# vgs
+  VG         #PV #LV #SN Attr   VSize   VFree
+  VolGroup00   1   2   0 wz--n- <38.97g    0 
+[root@lvm vagrant]# df
+Filesystem                      1K-blocks   Used Available Use% Mounted on
+/dev/mapper/VolGroup00-LogVol00  39269648 753556  38516092   2% /
+devtmpfs                           110948      0    110948   0% /dev
+tmpfs                              120692      0    120692   0% /dev/shm
+tmpfs                              120692   4584    116108   4% /run
+tmpfs                              120692      0    120692   0% /sys/fs/cgroup
+/dev/sde2                         1038336  64076    974260   7% /boot
+tmpfs                               24140      0     24140   0% /run/user/1000
+[root@lvm vagrant]# vgs
+  VG         #PV #LV #SN Attr   VSize   VFree
+  VolGroup00   1   2   0 wz--n- <38.97g    0 
+[root@lvm vagrant]# vgrename VolGroup00 OtusRoot
+  Volume group "VolGroup00" successfully renamed to "OtusRoot"
+[root@lvm vagrant]# vi /etc/fstab
+[root@lvm vagrant]# vi /etc/default/grub
+[root@lvm vagrant]# vi /boot/grub2/grub.cfg
+[root@lvm vagrant]# vi /boot/grub2/grub.cfg
+[root@lvm vagrant]# grub2-mkconfig -o /boot/grub2/grub.cfg
+/usr/sbin/grub2-probe: error: failed to get canonical path of `/dev/mapper/VolGroup00-LogVol00'.
+[root@lvm vagrant]# vi /boot/grub2/grub.cfg
+[root@lvm vagrant]# mkinitrd -f -v /boot/initramfs-$(uname -r).img $(uname -r)
+Executing: /sbin/dracut -f -v /boot/initramfs-3.10.0-862.2.3.el7.x86_64.img 3.10.0-862.2.3.el7.x86_64
+dracut module 'busybox' will not be installed, because command 'busybox' could not be found!
+dracut module 'crypt' will not be installed, because command 'cryptsetup' could not be found!
+dracut module 'dmraid' will not be installed, because command 'dmraid' could not be found!
+dracut module 'dmsquash-live-ntfs' will not be installed, because command 'ntfs-3g' could not be found!
+dracut module 'multipath' will not be installed, because command 'multipath' could not be found!
+dracut module 'busybox' will not be installed, because command 'busybox' could not be found!
+dracut module 'crypt' will not be installed, because command 'cryptsetup' could not be found!
+dracut module 'dmraid' will not be installed, because command 'dmraid' could not be found!
+dracut module 'dmsquash-live-ntfs' will not be installed, because command 'ntfs-3g' could not be found!
+dracut module 'multipath' will not be installed, because command 'multipath' could not be found!
+*** Including module: bash ***
+*** Including module: nss-softokn ***
+*** Including module: i18n ***
+*** Including module: drm ***
+*** Including module: plymouth ***
+*** Including module: dm ***
+Skipping udev rule: 64-device-mapper.rules
+Skipping udev rule: 60-persistent-storage-dm.rules
+Skipping udev rule: 55-dm.rules
+*** Including module: kernel-modules ***
+Omitting driver floppy
+*** Including module: lvm ***
+Skipping udev rule: 64-device-mapper.rules
+Skipping udev rule: 56-lvm.rules
+Skipping udev rule: 60-persistent-storage-lvm.rules
+*** Including module: qemu ***
+*** Including module: resume ***
+*** Including module: rootfs-block ***
+*** Including module: terminfo ***
+*** Including module: udev-rules ***
+Skipping udev rule: 40-redhat-cpu-hotplug.rules
+Skipping udev rule: 91-permissions.rules
+*** Including module: biosdevname ***
+*** Including module: systemd ***
+*** Including module: usrmount ***
+*** Including module: base ***
+*** Including module: fs-lib ***
+*** Including module: shutdown ***
+*** Including modules done ***
+*** Installing kernel module dependencies and firmware ***
+*** Installing kernel module dependencies and firmware done ***
+*** Resolving executable dependencies ***
+*** Resolving executable dependencies done***
+*** Hardlinking files ***
+*** Hardlinking files done ***
+*** Stripping files ***
+*** Stripping files done ***
+*** Generating early-microcode cpio image contents ***
+*** No early-microcode cpio image needed ***
+*** Store current command line parameters ***
+*** Creating image file ***
+*** Creating image file done ***
+*** Creating initramfs image file '/boot/initramfs-3.10.0-862.2.3.el7.x86_64.img' done ***
+[root@lvm vagrant]# reboot
+Connection to 127.0.0.1 closed by remote host.
+Connection to 127.0.0.1 closed.
+[vaa@localhost otus]$ vagrant ssh lvm
+ssh_exchange_identification: read: Connection reset by peer
+[vaa@localhost otus]$ vagrant ssh lvm
+Last login: Sun Feb 24 18:06:25 2019 from 10.0.2.2
+[vagrant@lvm ~]$ vgs
+  WARNING: Running as a non-root user. Functionality may be unavailable.
+  /run/lvm/lvmetad.socket: access failed: Permission denied
+  WARNING: Failed to connect to lvmetad. Falling back to device scanning.
+  /dev/mapper/control: open failed: Permission denied
+  Failure to communicate with kernel device-mapper driver.
+  Incompatible libdevmapper 1.02.146-RHEL7 (2018-01-22) and kernel driver (unknown version).
+[vagrant@lvm ~]$ sudo vgs
+  VG       #PV #LV #SN Attr   VSize   VFree
+  OtusRoot   1   2   0 wz--n- <38.97g    0 
+[vagrant@lvm ~]$ 
+
