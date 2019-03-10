@@ -1,0 +1,77 @@
+# -*- mode: ruby -*-
+# vim: set ft=ruby :
+
+MACHINES = {
+  :sysdunits => {
+        :box_name => "centos/7",
+        :ip_addr => '192.168.11.101',
+	:disks => {}	
+  },
+}
+
+Vagrant.configure("2") do |config|
+  config.vbguest.auto_update = false
+  config.vm.synced_folder ".", "/vagrant", disabled: true
+  MACHINES.each do |boxname, boxconfig|
+
+      config.vm.define boxname do |box|
+
+          box.vm.box = boxconfig[:box_name]
+          box.vm.host_name = boxname.to_s
+
+          box.vm.network "private_network", ip: boxconfig[:ip_addr]
+
+          box.vm.provider :virtualbox do |vb|
+            	  vb.customize ["modifyvm", :id, "--memory", "1024"]
+                  needsController = false
+		  boxconfig[:disks].each do |dname, dconf|
+			  unless File.exist?(dconf[:dfile])
+				vb.customize ['createhd', '--filename', dconf[:dfile], '--variant', 'Fixed', '--size', dconf[:size]]
+                                needsController =  true
+                          end
+
+		  end
+                  if needsController == true
+                     vb.customize ["storagectl", :id, "--name", "SATA", "--add", "sata" ]
+                     boxconfig[:disks].each do |dname, dconf|
+                         vb.customize ['storageattach', :id,  '--storagectl', 'SATA', '--port', dconf[:port], '--device', 0, '--type', 'hdd', '--medium', dconf[:dfile]]
+                     end
+                  end
+          end
+
+box.vm.provision "shell", inline: <<-SHELL
+            mkdir -p ~root/.ssh
+            cp ~vagrant/.ssh/auth* ~root/.ssh
+            timedatectl set-timezone Europe/Moscow
+            echo '# Configuration file for my watchlog service \n# Place it to /etc/sysconfig \n# File and word in that file that we will be monit \nWORD="ATATA" \nLOG=/var/log/watchlog.log'>>/etc/sysconfig/watchlog
+            echo 'Mar  3 13:06:11 localhost kernel: Initmem ATATA setup node 0 [mem 0x00001000-0x0ffeffff] \nMar  3 13:06:11 localhost kernel: ACPI: INT_SRC_OVR (bus 0 bus_irq 9 global_irq 9 low level) \nMar  3 13:06:11 localhost kernel: Using ACPI (MADT) for SMP configuration information \nMar  3 13:06:11 localhost kernel: smpboot: Allowing 1 CPUs, 0 hotplug CPUs \nMar  3 13:06:11 localhost kernel: PM: RegisteredATATAT nosave ATATAT memory: [mem 0x0009f000-0x0009ffff]'>>/var/log/watchlog.log
+            echo '#!/bin/bash \nWORD=$1 \nLOG=$2 \nDATE=`date` \nif grep $WORD $LOG &> /dev/null \nthen logger "$DATE: I found word, Master!" \nelse \nexit 0 \nfi'>>/opt/watchlog.sh
+            cd /opt
+            chmod +x watchlog.sh
+            echo '[Unit] \nDescription=My watchlog service \n \n[Service] \nType=oneshot \nEnvironmentFile=/etc/sysconfig/watchlog \nExecStart=/opt/watchlog.sh $WORD $LOG'>>/etc/systemd/system/watchlog.service
+            echo '[Unit] \nDescription=Run watchlog script every 30 second \n \n[Timer] \nOnBootSec=1 \nOnUnitActiveSec=30 \nUnit=watchlog.service \nAccuracySec=1us \n \n[Install] \nWantedBy=multi-user.target'>>/etc/systemd/system/watchlog.timer
+            systemctl start watchlog.timer
+            yum install epel-release -y && yum install spawn-fcgi php php-cli mod_fcgid httpd -y
+            echo 'SOCKET=/var/run/php-fcgi.sock \nOPTIONS="-u apache -g apache -s $SOCKET -S -M 0600 -C 32 -F 1 -P /var/run/spawn-fcgi.pid -- /usr/bin/php-cgi"'>>/etc/sysconfig/spawn-fcgi
+            echo '[Unit] \nDescription=Spawn-fcgi startup service by Otus \nAfter=network.target \n \n[Service] \nType=simple \nPIDFile=/var/run/spawn-fcgi.pid \nEnvironmentFile=/etc/sysconfig/spawn-fcgi \nExecStart=/usr/bin/spawn-fcgi -n $OPTIONS \nKillMode=process \n \n[Install] \nWantedBy=multi-user.target'>>/etc/systemd/system/spawn-fcgi.service
+            systemctl start spawn-fcgi
+            echo '[Unit] \nDescription=The Apache HTTP Server \nAfter=network.target remote-fs.target nss-lookup.target \nDocumentation=man:httpd(8) \nDocumentation=man:apachectl(8) \n \n[Service] \nType=notify \nEnvironmentFile=/etc/sysconfig/httpd-%I \nExecStart=/usr/sbin/httpd $OPTIONS -DFOREGROUND \nExecReload=usr/sbin/httpd $OPTIONS -k graceful \nExecStop=/bin/kill -WINCH ${MAINPID} \nKillSignal=SIGCONT \nPrivateTmp=true \n \n[Install] \nWantedBy=multi-user.target'>>/etc/systemd/system/httpd@.service
+            echo 'OPTIONS=-f conf/first.conf'>>/etc/sysconfig/httpd-first
+            echo 'OPTIONS=-f conf/second.conf'>>/etc/sysconfig/httpd-second
+            cp /etc/httpd/conf/httpd.conf /etc/httpd/conf/first.conf
+            cp /etc/httpd/conf/httpd.conf /etc/httpd/conf/second.conf
+            sed -i '41c\PidFile /var/run/httpd-second.pid' /etc/httpd/conf/second.conf
+            sed -i '42c\Listen 8080' /etc/httpd/conf/second.conf
+            systemctl start httpd@first
+            systemctl start httpd@second
+            yum install wget -y
+            cd /home/vagrant
+            wget http://www.atlassian.com/software/jira/downloads/binary/atlassian-jira-software-8.0.2-x64.bin -q && chmod +x atlassian-jira-software-8.0.2-x64.bin
+            echo 'o\n2\n/opt/atlassian/jira\n/var/atlassian/application-data/jira\n2\n8001\n8005\ny\ni\nn'>>jirainstall
+            cat jirainstall | ./atlassian-jira-software-8.0.2-x64.bin>>jirainstall_log
+            echo '[Unit] \nDescription=Atlassian Jira startup service by AV \nAfter=network.target \n \n[Service] \nType=simple \nPIDFile=/var/run/jira.pid \nExecStart=/opt/atlassian/jira/bin/start-jira.sh -fg \nKillMode=process \n \n[Install] \nWantedBy=multi-user.target'>>/etc/systemd/system/jira.service
+            systemctl start jira
+          SHELL
+end
+end
+end
