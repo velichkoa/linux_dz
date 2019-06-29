@@ -1,0 +1,65 @@
+# -*- mode: ruby -*-
+# vim: set ft=ruby :
+
+MACHINES = {
+  :PAM => {
+        :box_name => "centos/7",
+        :ip_addr => '192.168.11.101',
+	:disks => {}	
+  },
+}
+
+Vagrant.configure("2") do |config|
+  config.vbguest.auto_update = false
+  config.vm.synced_folder ".", "/vagrant", disabled: true
+  MACHINES.each do |boxname, boxconfig|
+
+      config.vm.define boxname do |box|
+
+          box.vm.box = boxconfig[:box_name]
+          box.vm.host_name = boxname.to_s
+
+          box.vm.network "private_network", ip: boxconfig[:ip_addr]
+
+          box.vm.provider :virtualbox do |vb|
+            	  vb.customize ["modifyvm", :id, "--memory", "1024"]
+                  needsController = false
+		  boxconfig[:disks].each do |dname, dconf|
+			  unless File.exist?(dconf[:dfile])
+				vb.customize ['createhd', '--filename', dconf[:dfile], '--variant', 'Fixed', '--size', dconf[:size]]
+                                needsController =  true
+                          end
+
+		  end
+                  if needsController == true
+                     vb.customize ["storagectl", :id, "--name", "SATA", "--add", "sata" ]
+                     boxconfig[:disks].each do |dname, dconf|
+                         vb.customize ['storageattach', :id,  '--storagectl', 'SATA', '--port', dconf[:port], '--device', 0, '--type', 'hdd', '--medium', dconf[:dfile]]
+                     end
+                  end
+          end
+
+box.vm.provision "shell", inline: <<-SHELL
+            mkdir -p ~root/.ssh
+            cp ~vagrant/.ssh/auth* ~root/.ssh
+            timedatectl set-timezone Europe/Moscow
+            groupadd admin
+            useradd User1
+            useradd User2 -g admin
+            useradd User3 -g admin
+            useradd User4
+            echo 'Otus2019' | sudo passwd --stdin User1      
+            echo 'Otusadmin2019' | sudo passwd --stdin User2
+            echo 'Otusadmin2019' | sudo passwd --stdin User3
+            echo 'Otus2019' | sudo passwd --stdin User4
+            echo '01.01 \n07.01 \n23.02 \n08.03 \n01.05 \n09.05 \n12.06 \n04.11'>/var/holidays
+            echo '#!/bin/bash \nif groups $PAM_USER | grep admin \nthen \nexit 0 \nfi \nif [[ `date +%u` -gt 5 ]] \nthen \nexit 1 \nelif date +%d.%m || grep /var/holidays \nthen \nexit 1 \nelse \nexit 0 \nfi'>/usr/local/bin/pamscriptlogin.sh
+            chmod 700 /usr/local/bin/pamscriptlogin.sh
+            echo 'User4 ALL=(ALL) NOPASSWD: ALL'>/etc/sudoers.d/User4
+            sed -i '7aaccount    required     pam_exec.so     /usr/local/bin/pamscriptlogin.sh' /etc/pam.d/sshd
+            sed -i 's/^PasswordAuthentication.*$/PasswordAuthentication yes/' /etc/ssh/sshd_config
+            systemctl restart sshd.service
+       SHELL
+end
+end
+end
