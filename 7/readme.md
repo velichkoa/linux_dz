@@ -1,3 +1,5 @@
+### Init
+
 Задание без *.
 
 Выполнял по методичке на virtualbox + vagrant (box 1804.02 centos/7 https://gitlab.com/otus_linux/stands-03-lvm/blob/master/Vagrantfile). 
