@@ -1,0 +1,45 @@
+---
+- name: Install FreeIPA server
+  hosts: server
+  become: yes
+  vars:
+    ipaserver_realm: OTUS.LOCAL 
+    ipaserver_domain: otus.local
+    ipaserver_hostname: ipaserver
+    ipaserver_ipv4: 192.168.11.101
+    ipa_ds_password: QWErty123
+    ipa_admin_password: qweRTY456
+
+  tasks:
+    - name: IPA-server package install
+      yum:
+        name: ipa-server
+        state: latest
+
+    - name: Add fqdn entires to /etc/hosts file
+      lineinfile:
+        path: /etc/hosts
+        line: "{{ ansible_eth1.ipv4.address }} {{ ipaserver_hostname + '.' + ipaserver_domain }} {{ ipaserver_hostname + '.' + ipaserver_domain }}"
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: check server config
+      register: freeipaserver_ipaconf
+      check_mode: no
+      stat:
+        path: /etc/ipa/default.conf
+
+    - name: ipa-server-install
+      become: true
+      command: >
+        ipa-server-install -U
+        --realm {{ ipaserver_realm }}
+        --domain {{ ipaserver_domain }}
+        --hostname={{ ipaserver_hostname + '.' + ipaserver_domain }} 
+        --ds-password {{ ipa_ds_password }}
+        --admin-password {{ ipa_admin_password }}
+        --ip-address={{ ipaserver_ipv4 }}
+        --mkhomedir
+      when: not freeipaserver_ipaconf.stat.exists
+        

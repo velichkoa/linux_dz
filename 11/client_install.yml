@@ -1,0 +1,47 @@
+---
+- name: Install FreeIPA client
+  hosts: client
+  become: yes
+  vars:
+    ipaserver_realm: OTUS.LOCAL 
+    ipaserver_domain: otus.local
+    ipaclient_hostname: ipaclient
+    ipaserver_hostname: ipaserver
+    ipaclient_ipv4: 192.168.11.102
+    ipaclient_principal: admin
+    ipa_admin_password: qweRTY456
+
+  tasks:
+    - name: IPA-client package install
+      yum:
+        name: ipa-client
+        state: latest
+
+    - name: Add fqdn entires to /etc/hosts file
+      lineinfile:
+        path: /etc/hosts
+        line: "{{ ipaclient_ipv4 }} {{ ipaclient_hostname + '.' + ipaserver_domain }}"
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: check client config
+      register: freeipaclient_ipaconf
+      check_mode: no
+      stat:
+        path: /etc/ipa/default.conf
+
+    - name: ipa-client-install
+      become: true
+      command: >
+        ipa-client-install -U
+        --realm {{ ipaserver_realm }}
+        --domain {{ ipaserver_domain }}
+        --principal {{ ipaclient_principal }}
+        --password {{ ipa_admin_password }}
+        --server {{ ipaserver_hostname + '.' + ipaserver_domain }}
+        --hostname {{ ipaclient_hostname + '.' + ipaserver_domain }}
+        --force-ntpd
+        --mkhomedir
+      when: not freeipaclient_ipaconf.stat.exists
+        
